@@ -8,12 +8,13 @@
 #include <list>
 #include <numeric>
 
+static bool ENGINE_LIMIT_FPS = false;
 
-class Engine {
+class Grid2DEngine {
 public:
-	Engine();
-	Engine(unsigned int grid_cols, unsigned int grid_rows);
-	~Engine();
+	Grid2DEngine();
+	Grid2DEngine(unsigned int grid_cols, unsigned int grid_rows);
+	~Grid2DEngine();
 
 	void init(const char* title, int x, int y, int width, int height, bool fullscreen);
 	

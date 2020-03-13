@@ -1,6 +1,6 @@
 #include "Engine.h"
 
-Engine::Engine() : grid(10, 10) {
+Grid2DEngine::Grid2DEngine() : grid(10, 10) {
 	this->isRunning = false;
 	this->window = nullptr;
 	this->renderer = nullptr;
@@ -9,7 +9,7 @@ Engine::Engine() : grid(10, 10) {
 	this->height = 0;
 }
 
-Engine::Engine(unsigned int grid_cols, unsigned int grid_rows)
+Grid2DEngine::Grid2DEngine(unsigned int grid_cols, unsigned int grid_rows)
 	: grid(grid_cols, grid_rows) {
 	this->isRunning = false;
 	this->window = nullptr;
@@ -19,10 +19,10 @@ Engine::Engine(unsigned int grid_cols, unsigned int grid_rows)
 	this->height = 0;
 }
 
-Engine::~Engine() {
+Grid2DEngine::~Grid2DEngine() {
 }
 
-void Engine::init(const char* title, int x, int y, int width, int height, bool fullscreen) {
+void Grid2DEngine::init(const char* title, int x, int y, int width, int height, bool fullscreen) {
 	this->width = width;
 	this->height = height;
 	if (SDL_Init(SDL_INIT_EVERYTHING) == 0) {
@@ -61,28 +61,35 @@ void Engine::init(const char* title, int x, int y, int width, int height, bool f
 
 
 
-void Engine::engineLoop() {
+void Grid2DEngine::engineLoop() {
 	Uint32 now = SDL_GetTicks();
 
 	this->handleEvents();
 
-	if (next_game_step <= now) {
+	if (ENGINE_LIMIT_FPS) {
+		if (next_game_step <= now) {
 
-		int computer_is_too_slow_limit = 10; // max number of advances per render, adjust this according to your minimum playable fps
+			int computer_is_too_slow_limit = 10; // max number of advances per render, adjust this according to your minimum playable fps
 
-		// Loop until all steps are executed or computer_is_too_slow_limit is reached
-		while ((next_game_step <= now) && (computer_is_too_slow_limit--)) {
-			this->update();
-			next_game_step += time_step_ms; // count 1 game tick done
+			// Loop until all steps are executed or computer_is_too_slow_limit is reached
+			while ((next_game_step <= now) && (computer_is_too_slow_limit--)) {
+				this->update();
+				next_game_step += time_step_ms; // count 1 game tick done
+			}
+
+			this->render();
 		}
-
-		this->render();
+		else {
+			// we're too fast, wait a bit.
+			if (next_game_step - now > 10) {
+				SDL_Delay(next_game_step - now);
+			}
+		}
 	}
 	else {
-		// we're too fast, wait a bit.
-		if (next_game_step - now > 10) {
-			SDL_Delay(next_game_step - now);
-		}
+		this->update();
+
+		this->render();
 	}
 
 	frametime_tracker.push_back(SDL_GetTicks() - now);
@@ -96,7 +103,7 @@ void Engine::engineLoop() {
 
 }
 
-void Engine::handleEvents() {
+void Grid2DEngine::handleEvents() {
 	SDL_Event event;
 	SDL_PollEvent(&event);
 
@@ -119,11 +126,11 @@ void Engine::handleEvents() {
 	}
 }
 
-void Engine::update() {
+void Grid2DEngine::update() {
 	
 }
 
-void Engine::render() {
+void Grid2DEngine::render() {
 	SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
 
 	SDL_RenderClear(this->renderer);
@@ -140,7 +147,7 @@ void Engine::render() {
 	SDL_RenderPresent(renderer);
 }
 
-void Engine::clean() {
+void Grid2DEngine::clean() {
 	SDL_DestroyWindow(this->window);
 	SDL_DestroyRenderer(this->renderer);
 	SDL_Quit();
@@ -148,11 +155,11 @@ void Engine::clean() {
 	std::cout << "Engine cleaned!" << std::endl;
 }
 
-bool Engine::running() {
+bool Grid2DEngine::running() {
 	return this->isRunning;
 }
 
-void Engine::drawGrid() {
+void Grid2DEngine::drawGrid() {
 	float rect_size_width = (float)this->width / (float)this->grid.getColumns();
 	float rect_size_height = (float)this->height / (float)this->grid.getRows();
 

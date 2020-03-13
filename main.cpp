@@ -4,7 +4,7 @@
 #include "Engine.h"
 #include "Grid2D.h"
 
-Engine* engine = nullptr;
+Grid2DEngine* engine = nullptr;
 
 int main(int argc, char* argv[]) {
 	
@@ -15,9 +15,11 @@ int main(int argc, char* argv[]) {
 	//return EXIT_SUCCESS;
 
 	
-	engine = new Engine(15, 15);
+	engine = new Grid2DEngine(15, 15);
 
 	engine->init("My Game", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 800, 600, false);
+
+	ENGINE_LIMIT_FPS = true;
 
 	while (engine->running()) {
 		engine->engineLoop();
