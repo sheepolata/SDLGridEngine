@@ -19,10 +19,26 @@ Tile::~Tile() {
 int* Tile::getColor() {
 	int* col = new int[4];
 
-	col[0] = rand() % 255;
-	col[1] = rand() % 255;
-	col[2] = rand() % 255;
-	col[3] = rand() % 255;
+	switch (this->type) {
+	case TILE_TYPE::MOUNTAIN:
+		col[0] = 139;
+		col[1] = 69;
+		col[2] = 19;
+		break;
+	case TILE_TYPE::PLAIN:
+		col[0] = 85;
+		col[1] = 107;
+		col[2] = 47;
+		break;
+	case TILE_TYPE::DEFAULT:
+	default:
+		col[0] = 255;
+		col[1] = 255;
+		col[2] = 255;
+		break;
+	}
+
+	col[3] = 255;
 
 	return col;
 }
@@ -52,23 +68,15 @@ Grid2D::Grid2D(unsigned int cols, unsigned int rows) {
 		this->tileGrid[i] = new Tile[this->columns];
 	}
 
-	//this->tileGrid = new (Tile**)[rows];
-	//for (size_t y = 0; y < rows; y++) {
-	//	this->tileGrid[y] = new (Tile*)[cols];
-	//}
 	for (size_t y = 0; y < rows; y++) {
 		for (size_t x = 0; x < cols; x++) {
-			this->tileGrid[y][x] = Tile(x, y, TILE_TYPE::DEFAULT);
+			TILE_TYPE t = rand()%3 == 0? TILE_TYPE::MOUNTAIN : TILE_TYPE::PLAIN;
+			this->tileGrid[y][x] = Tile(x, y, t);
 		}
 	}
 }
 
 Grid2D::~Grid2D() {
-	/*for (size_t y = 0; y < this->rows; y++) {
-		for (size_t x = 0; x < this->columns; x++) {
-			delete this->tileGrid[y][x];
-		}
-	}*/
 	for (size_t y = 0; y < this->rows; y++) {
 		delete[] this->tileGrid[y];
 	}

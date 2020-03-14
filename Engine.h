@@ -4,11 +4,11 @@
 
 #include <SDL.h>
 #include <iostream>
-#include "Grid2D.h"
 #include <list>
 #include <numeric>
 
-static bool ENGINE_LIMIT_FPS = false;
+#include "Grid2D.h"
+#include "globals.h"
 
 class Grid2DEngine {
 public:

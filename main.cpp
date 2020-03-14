@@ -3,8 +3,12 @@
 
 #include "Engine.h"
 #include "Grid2D.h"
+#include "globals.h"
 
 Grid2DEngine* engine = nullptr;
+
+//extern bool ENGINE_LIMIT_FPS;
+bool ENGINE_LIMIT_FPS;
 
 int main(int argc, char* argv[]) {
 	

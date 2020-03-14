@@ -6,7 +6,9 @@
 #include <iostream>
 
 enum class TILE_TYPE {
-	DEFAULT = -1
+	DEFAULT = -1,
+	PLAIN = 0,
+	MOUNTAIN = 1
 };
 
 class Tile {
@@ -15,10 +17,10 @@ public:
 	Tile(unsigned int x, unsigned int y, TILE_TYPE t);
 	~Tile();
 
-	TILE_TYPE getType() {
-		return this->type;
-	}
-
+	TILE_TYPE getType() { return this->type; }
+	bool wasModified() { return this->modified; }
+	void setModified(bool b) { this->modified = b; }
+	
 	int* getColor();
 
 	std::string toString();
@@ -28,6 +30,8 @@ private:
 	unsigned int ypos;
 
 	TILE_TYPE type;
+
+	bool modified = true;
 };
 
 /////////////////////////////////////////////////////////////////////
@@ -39,8 +43,8 @@ public:
 
 	void DEBUG_printGrid();
 
-	Tile get(unsigned int x, unsigned int y) {
-		return this->tileGrid[y][x];
+	Tile* get(unsigned int x, unsigned int y) {
+		return &this->tileGrid[y][x];
 	}
 	unsigned int getColumns() { return this->columns; }
 	unsigned int getRows() { return this->rows; }

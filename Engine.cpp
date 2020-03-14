@@ -165,9 +165,9 @@ void Grid2DEngine::drawGrid() {
 
 	for (size_t y = 0; y < this->grid.getRows(); y++) {
 		for (size_t x = 0; x < this->grid.getColumns(); x++) {
-			int* colors = this->grid.get(x, y).getColor();
+			int* colors = this->grid.get(x, y)->getColor();
 			SDL_SetRenderDrawColor(renderer, colors[0], colors[1], colors[2], colors[3]);
-			SDL_FRect rect = {x * rect_size_width, y * rect_size_height, rect_size_width, rect_size_height};
+			SDL_FRect rect = { x * rect_size_width, y * rect_size_height, rect_size_width, rect_size_height };
 			SDL_RenderFillRectF(this->renderer, &rect);
 			delete[] colors;
 		}
