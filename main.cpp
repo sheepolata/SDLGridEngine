@@ -19,7 +19,9 @@ int main(int argc, char* argv[]) {
 	//return EXIT_SUCCESS;
 
 	
-	engine = new Grid2DEngine(15, 15);
+	engine = new Grid2DEngine();
+
+	engine->addGrid2D("map1", 10, 10, true);
 
 	engine->init("My Game", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 800, 600, false);
 

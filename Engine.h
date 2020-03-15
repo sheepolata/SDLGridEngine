@@ -13,7 +13,6 @@
 class Grid2DEngine {
 public:
 	Grid2DEngine();
-	Grid2DEngine(unsigned int grid_cols, unsigned int grid_rows);
 	~Grid2DEngine();
 
 	void init(const char* title, int x, int y, int width, int height, bool fullscreen);
@@ -26,6 +25,11 @@ public:
 	void clean();
 
 	bool running();
+
+	std::string getCurrentMap() { return this->current_map; }
+	void setCurrentMap(std::string s) { this->current_map = s; }
+
+	void addGrid2D(std::string name, unsigned int w, unsigned int h, bool SET_AS_CURRENT_MAP=false);
 
 private:
 	Uint32 max_fps = 60;
@@ -40,9 +44,10 @@ private:
 	int width; 
 	int height;
 
-	Grid2D grid;
+	std::map<std::string, Grid2D*> mGrids2D;
+	std::string current_map;
 
-	void drawGrid();
+	void drawGrid(std::string name);
 };
 
 

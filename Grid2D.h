@@ -32,6 +32,10 @@ private:
 	TILE_TYPE type;
 
 	bool modified = true;
+
+	bool isEnemyRoad = false;
+	bool isTowerBuildable = false;
+	
 };
 
 /////////////////////////////////////////////////////////////////////
@@ -39,6 +43,7 @@ private:
 class Grid2D {
 public:
 	Grid2D(unsigned int cols, unsigned int rows);
+	Grid2D() : Grid2D(10, 10) {};
 	~Grid2D();
 
 	void DEBUG_printGrid();

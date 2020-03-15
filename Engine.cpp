@@ -1,25 +1,19 @@
 #include "Engine.h"
 
-Grid2DEngine::Grid2DEngine() : grid(10, 10) {
+Grid2DEngine::Grid2DEngine() {
 	this->isRunning = false;
 	this->window = nullptr;
 	this->renderer = nullptr;
 
 	this->width = 0;
 	this->height = 0;
-}
 
-Grid2DEngine::Grid2DEngine(unsigned int grid_cols, unsigned int grid_rows)
-	: grid(grid_cols, grid_rows) {
-	this->isRunning = false;
-	this->window = nullptr;
-	this->renderer = nullptr;
-
-	this->width = 0;
-	this->height = 0;
+	this->mGrids2D = std::map<std::string, Grid2D*>();
+	current_map = "None";
 }
 
 Grid2DEngine::~Grid2DEngine() {
+	this->mGrids2D.clear();
 }
 
 void Grid2DEngine::init(const char* title, int x, int y, int width, int height, bool fullscreen) {
@@ -98,7 +92,7 @@ void Grid2DEngine::engineLoop() {
 		float _avg = (float)std::accumulate(frametime_tracker.begin(), frametime_tracker.end(), 0.0) / (float)frametime_tracker.size();
 		float _fps = 1000.0f / _avg;
 		int _ifps = (int)(_fps/2.0f);
-		SDL_SetWindowTitle(this->window, ("My Game. " + std::to_string(_ifps) + "fps").c_str());
+		SDL_SetWindowTitle(this->window, (this->current_map + ". " + std::to_string(_ifps) + "fps").c_str());
 	}
 
 }
@@ -136,7 +130,7 @@ void Grid2DEngine::render() {
 	SDL_RenderClear(this->renderer);
 	//This is where we would render stuff
 
-	this->drawGrid();
+	this->drawGrid(this->current_map);
 	//this->grid.DEBUG_printGrid();
 
 	SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
@@ -159,17 +153,34 @@ bool Grid2DEngine::running() {
 	return this->isRunning;
 }
 
-void Grid2DEngine::drawGrid() {
-	float rect_size_width = (float)this->width / (float)this->grid.getColumns();
-	float rect_size_height = (float)this->height / (float)this->grid.getRows();
+void Grid2DEngine::addGrid2D(std::string name, unsigned int w, unsigned int h, bool SET_AS_CURRENT_MAP) {
+	this->mGrids2D[name] = new Grid2D(w, h);
+	if (SET_AS_CURRENT_MAP)
+		this->current_map = name;
+}
 
-	for (size_t y = 0; y < this->grid.getRows(); y++) {
-		for (size_t x = 0; x < this->grid.getColumns(); x++) {
-			int* colors = this->grid.get(x, y)->getColor();
-			SDL_SetRenderDrawColor(renderer, colors[0], colors[1], colors[2], colors[3]);
-			SDL_FRect rect = { x * rect_size_width, y * rect_size_height, rect_size_width, rect_size_height };
-			SDL_RenderFillRectF(this->renderer, &rect);
-			delete[] colors;
+void Grid2DEngine::drawGrid(std::string name) {
+
+	auto it = this->mGrids2D.find(name);
+	if (it != this->mGrids2D.end()) {
+		//Grid2D* grid = &this->mGrids2D[name];
+		Grid2D* grid = it->second;
+
+		float rect_size_width = (float)this->width / (float)grid->getColumns();
+		float rect_size_height = (float)this->height / (float)grid->getRows();
+
+		for (size_t y = 0; y < grid->getRows(); y++) {
+			for (size_t x = 0; x < grid->getColumns(); x++) {
+				int* colors = grid->get(x, y)->getColor();
+				//int* colors = new int[4] { 128, 45, 95, 255 };
+				SDL_SetRenderDrawColor(renderer, colors[0], colors[1], colors[2], colors[3]);
+				SDL_FRect rect = { x * rect_size_width, y * rect_size_height, rect_size_width, rect_size_height };
+				SDL_RenderFillRectF(this->renderer, &rect);
+				delete[] colors;
+			}
 		}
+	}
+	else {
+		std::cerr << name << " is not stored in the Engine!" << std::endl;
 	}
 }
