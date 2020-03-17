@@ -21,7 +21,9 @@ int main(int argc, char* argv[]) {
 	
 	engine = new Grid2DEngine();
 
-	engine->addGrid2D("map1", 10, 10, true);
+	std::vector<std::string> vTileProperties = {"isEnemyRoad", "isEnemySpawn", "isTowerBuildable", "isEnemyGoal"};
+
+	engine->addGrid2D("map1", 10, 10, vTileProperties, true);
 
 	engine->init("My Game", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 800, 600, false);
 

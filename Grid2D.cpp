@@ -7,10 +7,14 @@ Tile::Tile() {
 	this->type = TILE_TYPE::DEFAULT;
 }
 
-Tile::Tile(unsigned int x, unsigned int y, TILE_TYPE t) {
+Tile::Tile(unsigned int x, unsigned int y, std::vector<std::string> vPropertyList, TILE_TYPE t) {
 	this->xpos = x;
 	this->ypos = y;
 	this->type = t;
+
+	for (std::string prop : vPropertyList) {
+		this->mProperties[prop] = false;
+	}
 }
 
 Tile::~Tile() {
@@ -59,7 +63,7 @@ std::string Tile::toString() {
 /////////////////////////////////////////////////////////////////////
 
 
-Grid2D::Grid2D(unsigned int cols, unsigned int rows) {
+Grid2D::Grid2D(unsigned int cols, unsigned int rows, std::vector<std::string> vTileProperties) {
 	this->columns = cols;
 	this->rows = rows;
 
@@ -71,7 +75,7 @@ Grid2D::Grid2D(unsigned int cols, unsigned int rows) {
 	for (size_t y = 0; y < rows; y++) {
 		for (size_t x = 0; x < cols; x++) {
 			TILE_TYPE t = rand()%3 == 0? TILE_TYPE::MOUNTAIN : TILE_TYPE::PLAIN;
-			this->tileGrid[y][x] = Tile(x, y, t);
+			this->tileGrid[y][x] = Tile(x, y, vTileProperties, t);
 		}
 	}
 }

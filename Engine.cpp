@@ -33,6 +33,7 @@ void Grid2DEngine::init(const char* title, int x, int y, int width, int height, 
 		else {
 			this->isRunning = false;
 			std::cout << "Window could not be created!" << std::endl;
+			return;
 		}
 
 		this->renderer = SDL_CreateRenderer(window, -1, 0);
@@ -43,8 +44,10 @@ void Grid2DEngine::init(const char* title, int x, int y, int width, int height, 
 		else {
 			this->isRunning = false;
 			std::cout << "Renderer could not be created!" << std::endl;
+			return;
 		}
 
+		this->bInitialised = true;
 		this->isRunning = true;
 	}
 	else {
@@ -56,6 +59,11 @@ void Grid2DEngine::init(const char* title, int x, int y, int width, int height, 
 
 
 void Grid2DEngine::engineLoop() {
+	if (!this->bInitialised) {
+		std::cerr << "Engine not initialised!" << std::endl;
+		return;
+	}
+
 	Uint32 now = SDL_GetTicks();
 
 	this->handleEvents();
@@ -153,8 +161,8 @@ bool Grid2DEngine::running() {
 	return this->isRunning;
 }
 
-void Grid2DEngine::addGrid2D(std::string name, unsigned int w, unsigned int h, bool SET_AS_CURRENT_MAP) {
-	this->mGrids2D[name] = new Grid2D(w, h);
+void Grid2DEngine::addGrid2D(std::string name, unsigned int w, unsigned int h, std::vector<std::string> vTileProperties, bool SET_AS_CURRENT_MAP) {
+	this->mGrids2D[name] = new Grid2D(w, h, vTileProperties);
 	if (SET_AS_CURRENT_MAP)
 		this->current_map = name;
 }

@@ -29,7 +29,7 @@ public:
 	std::string getCurrentMap() { return this->current_map; }
 	void setCurrentMap(std::string s) { this->current_map = s; }
 
-	void addGrid2D(std::string name, unsigned int w, unsigned int h, bool SET_AS_CURRENT_MAP=false);
+	void addGrid2D(std::string name, unsigned int w, unsigned int h, std::vector<std::string> vTileProperties, bool SET_AS_CURRENT_MAP=false);
 
 private:
 	Uint32 max_fps = 60;
@@ -38,12 +38,14 @@ private:
 	std::list<Uint32> frametime_tracker = std::list<Uint32>();
 
 	bool isRunning;
+	bool bInitialised = false;
 	SDL_Window* window;
 	SDL_Renderer* renderer;
 
 	int width; 
 	int height;
 
+	std::vector<std::string> vTilePropertyList;
 	std::map<std::string, Grid2D*> mGrids2D;
 	std::string current_map;
 

@@ -4,6 +4,8 @@
 
 #include <string>
 #include <iostream>
+#include <map>
+#include <vector>
 
 enum class TILE_TYPE {
 	DEFAULT = -1,
@@ -14,14 +16,29 @@ enum class TILE_TYPE {
 class Tile {
 public:
 	Tile();
-	Tile(unsigned int x, unsigned int y, TILE_TYPE t);
+	Tile(unsigned int x, unsigned int y, std::vector<std::string> vPropertyList, TILE_TYPE t);
 	~Tile();
 
 	TILE_TYPE getType() { return this->type; }
 	bool wasModified() { return this->modified; }
 	void setModified(bool b) { this->modified = b; }
-	
 	int* getColor();
+
+	bool getProperty(std::string prop) {
+		if (this->mProperties.find(prop) != this->mProperties.end())
+			return this->mProperties[prop];
+		std::cerr << prop << " is not a tile property!" << std::endl;
+		return false;
+	}
+	//Return true if add was successful, false otherwise
+	bool setProperty(std::string prop, bool value, bool ADD_IF_NOT_IN_MAP = false) {
+		if (!ADD_IF_NOT_IN_MAP && this->mProperties.find(prop) == this->mProperties.end()) {
+			std::cerr << prop << " is not a tile property! SetProperty canceled" << std::endl;
+			return false;
+		}
+		this->mProperties[prop] = value;
+		return true;
+	}
 
 	std::string toString();
 
@@ -33,17 +50,15 @@ private:
 
 	bool modified = true;
 
-	bool isEnemyRoad = false;
-	bool isTowerBuildable = false;
-	
+	std::map<std::string, bool> mProperties = std::map<std::string, bool>();
 };
 
 /////////////////////////////////////////////////////////////////////
 
 class Grid2D {
 public:
-	Grid2D(unsigned int cols, unsigned int rows);
-	Grid2D() : Grid2D(10, 10) {};
+	Grid2D(unsigned int cols, unsigned int rows, std::vector<std::string> vTilesProperties);
+	Grid2D() : Grid2D(10, 10, std::vector<std::string>()) {};
 	~Grid2D();
 
 	void DEBUG_printGrid();
