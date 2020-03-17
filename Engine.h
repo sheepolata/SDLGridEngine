@@ -75,6 +75,7 @@ public:
 		}
 
 		Uint32 now = SDL_GetTicks();
+		this->fElapsedTime = (now - this->fLastTime) / 1000.0f;
 
 		this->handleEvents();
 
@@ -109,9 +110,11 @@ public:
 		if (!this->frametime_tracker.empty()) {
 			float _avg = (float)std::accumulate(frametime_tracker.begin(), frametime_tracker.end(), 0.0) / (float)frametime_tracker.size();
 			float _fps = 1000.0f / _avg;
-			int _ifps = (int)(_fps / 2.0f);
-			SDL_SetWindowTitle(this->window, (this->current_map + ". " + std::to_string(_ifps) + "fps").c_str());
+			int _ifps = (int)(_fps);
+			SDL_SetWindowTitle(this->window, (this->current_map + ". " + std::to_string(_ifps) + "fps, fElapedTime="+std::to_string(this->fElapsedTime)).c_str());
 		}
+
+		this->fLastTime = now;
 
 	}
 
@@ -133,6 +136,15 @@ public:
 				break;
 			}
 			break;
+		case SDL_KEYUP:
+			switch (event.key.keysym.sym) {
+			case SDLK_r:
+				break;
+			case SDLK_ESCAPE:
+				this->isRunning = false;
+				break;
+			}
+			break;
 		default:
 			break;
 		}
@@ -147,12 +159,8 @@ public:
 		//This is where we would render stuff
 
 		this->drawGrid(this->current_map);
-		//this->grid.DEBUG_printGrid();
 
-		SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
-		//SDL_RenderDrawLine(renderer, 50, 50, 300, 300);
-		//SDL_Rect rect = { 50, 50, 150, 150 };
-		//SDL_RenderFillRect(renderer, &rect);
+		//SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
 
 		SDL_RenderPresent(renderer);
 	}
@@ -178,10 +186,13 @@ public:
 	}
 
 private:
-	Uint32 max_fps = 60;
+	Uint32 max_fps = 30;
 	Uint32 time_step_ms = 1000 / max_fps;
 	Uint32 next_game_step = SDL_GetTicks(); // initial value
 	std::list<Uint32> frametime_tracker = std::list<Uint32>();
+
+	Uint32 fLastTime = 0.0f;
+	float fElapsedTime = 0.0f;
 
 	bool isRunning;
 	bool bInitialised = false;
