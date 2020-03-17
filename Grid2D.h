@@ -55,15 +55,45 @@ private:
 
 /////////////////////////////////////////////////////////////////////
 
+template<class cTile>
 class Grid2D {
 public:
-	Grid2D(unsigned int cols, unsigned int rows, std::vector<std::string> vTilesProperties);
+	Grid2D(unsigned int cols, unsigned int rows, std::vector<std::string> vTilesProperties) {
+		this->columns = cols;
+		this->rows = rows;
+
+		this->tileGrid = new Tile * [this->rows];
+		for (size_t i = 0; i < this->rows; i++) {
+			this->tileGrid[i] = new Tile[this->columns];
+		}
+
+		for (size_t y = 0; y < rows; y++) {
+			for (size_t x = 0; x < cols; x++) {
+				TILE_TYPE t = rand() % 3 == 0 ? TILE_TYPE::MOUNTAIN : TILE_TYPE::PLAIN;
+				this->tileGrid[y][x] = cTile(x, y, vTilesProperties, t);
+			}
+		}
+	}
 	Grid2D() : Grid2D(10, 10, std::vector<std::string>()) {};
-	~Grid2D();
+	~Grid2D() {
+		for (size_t y = 0; y < this->rows; y++) {
+			delete[] this->tileGrid[y];
+		}
 
-	void DEBUG_printGrid();
+		delete[] this->tileGrid;
+	}
 
-	Tile* get(unsigned int x, unsigned int y) {
+	void DEBUG_printGrid() {
+		for (size_t y = 0; y < this->rows; y++) {
+			for (size_t x = 0; x < this->columns; x++) {
+				std::cout << this->tileGrid[y][x].toString() << " ";
+			}
+			std::cout << std::endl;
+		}
+	}
+
+
+	cTile* get(unsigned int x, unsigned int y) {
 		return &this->tileGrid[y][x];
 	}
 	unsigned int getColumns() { return this->columns; }
@@ -72,7 +102,7 @@ public:
 private:
 	unsigned int columns;
 	unsigned int rows;
-	Tile** tileGrid;
+	cTile** tileGrid;
 };
 
 #endif GRID2D_HPP
