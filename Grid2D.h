@@ -20,6 +20,8 @@ public:
 	~Tile();
 
 	TILE_TYPE getType() { return this->type; }
+	unsigned int getXPos() { return this->xpos; }
+	unsigned int getYPos() { return this->ypos; }
 	bool wasModified() { return this->modified; }
 	void setModified(bool b) { this->modified = b; }
 	int* getColor();

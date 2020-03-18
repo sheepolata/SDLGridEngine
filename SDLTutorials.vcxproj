@@ -20,14 +20,25 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Engine.cpp" />
+    <ClCompile Include="Entity.cpp" />
     <ClCompile Include="globals.cpp" />
     <ClCompile Include="Grid2D.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="SDL2_framerate.c" />
+    <ClCompile Include="SDL2_gfxPrimitives.c" />
+    <ClCompile Include="SDL2_imageFilter.c" />
+    <ClCompile Include="SDL2_rotozoom.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine.h" />
+    <ClInclude Include="Entity.h" />
     <ClInclude Include="globals.h" />
     <ClInclude Include="Grid2D.h" />
+    <ClInclude Include="SDL2_framerate.h" />
+    <ClInclude Include="SDL2_gfxPrimitives.h" />
+    <ClInclude Include="SDL2_gfxPrimitives_font.h" />
+    <ClInclude Include="SDL2_imageFilter.h" />
+    <ClInclude Include="SDL2_rotozoom.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

@@ -55,6 +55,19 @@ std::string Tile::toString() {
 	str.append(std::to_string(this->ypos));
 	str.append(" / ");
 	str.append(std::to_string((int)this->type));
+	str.append(" / ");
+
+	for (auto it = this->mProperties.begin(); it != this->mProperties.end(); it++) {
+		//std::cout << it->first  // string (key)
+			//<< ':'
+			//<< it->second   // string's value 
+			//<< std::endl;
+		str.append(it->first);
+		str.append(":");
+		str.append(std::to_string(it->second));
+		str.append(" ");
+	}
+
 	
 	return str;
 }

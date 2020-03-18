@@ -8,7 +8,9 @@
 #include <numeric>
 
 #include "Grid2D.h"
+#include "Entity.h"
 #include "globals.h"
+#include "SDL2_gfxPrimitives.h"
 
 template<class cTile>
 class Grid2DEngine {
@@ -23,9 +25,12 @@ public:
 
 		this->mGrids2D = std::map<std::string, Grid2D<cTile>*>();
 		current_map = "None";
+
+		this->e = new Entity();
 	}
 	~Grid2DEngine() {
 		this->mGrids2D.clear();
+		delete this->e;
 	}
 
 	void init(const char* title, int x, int y, int width, int height, bool fullscreen) {
@@ -111,7 +116,7 @@ public:
 			float _avg = (float)std::accumulate(frametime_tracker.begin(), frametime_tracker.end(), 0.0) / (float)frametime_tracker.size();
 			float _fps = 1000.0f / _avg;
 			int _ifps = (int)(_fps);
-			SDL_SetWindowTitle(this->window, (this->current_map + ". " + std::to_string(_ifps) + "fps, fElapedTime="+std::to_string(this->fElapsedTime)).c_str());
+			SDL_SetWindowTitle(this->window, (this->current_map + ". " + std::to_string(_ifps) + "fps, fElapedTime=" + std::to_string(this->fElapsedTime)).c_str());
 		}
 
 		this->fLastTime = now;
@@ -145,11 +150,39 @@ public:
 				break;
 			}
 			break;
+		case SDL_MOUSEBUTTONUP: {
+			int mp_x, mp_y;
+			SDL_GetMouseState(&mp_x, &mp_y);
+			int* grid_pos = mousePosToGridPos(mp_x, mp_y);
+
+			if (this->selected != nullptr) {
+				//std::cout << this->selected->getXPos() << this->selected->getYPos() << " ";
+				//std::cout << grid_pos[0] << grid_pos[1] << std::endl;
+				if (this->selected->getXPos() == grid_pos[0]
+					&& this->selected->getYPos() == grid_pos[1]) {
+					this->selected = nullptr;
+				}
+				else {
+					this->selected = this->mGrids2D[this->current_map]->get(grid_pos[0], grid_pos[1]);
+					std::cout << this->selected->toString() << std::endl;
+				}
+			}
+			else {
+				this->selected = this->mGrids2D[this->current_map]->get(grid_pos[0], grid_pos[1]);
+				std::cout << this->selected->toString() << std::endl;
+			}
+
+
+			delete[] grid_pos;
+			break;
+		}
 		default:
 			break;
 		}
 	}
 	void update() {
+	
+
 
 	}
 	void render() {
@@ -160,7 +193,9 @@ public:
 
 		this->drawGrid(this->current_map);
 
-		//SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+		filledEllipseRGBA(renderer, (Sint16)e->getXPos(), (Sint16)e->getYPos(), 10, 10, 255, 255, 255, 255);
+		SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+		//SDL_RenderDrawPointF(renderer, this->e->getXPos(), this->e->getYPos());
 
 		SDL_RenderPresent(renderer);
 	}
@@ -191,7 +226,7 @@ private:
 	Uint32 next_game_step = SDL_GetTicks(); // initial value
 	std::list<Uint32> frametime_tracker = std::list<Uint32>();
 
-	Uint32 fLastTime = 0.0f;
+	Uint32 fLastTime = 0;
 	float fElapsedTime = 0.0f;
 
 	bool isRunning;
@@ -205,6 +240,29 @@ private:
 	std::vector<std::string> vTilePropertyList;
 	std::map<std::string, Grid2D<cTile>*> mGrids2D;
 	std::string current_map;
+
+	cTile* selected = nullptr;
+
+	int* mousePosToGridPos(int mpx, int mpy) {
+		int gx = -1; int gy = -1;
+		int* res = new int[2];
+		res[0] = gx;
+		res[1] = gy;
+		if (this->current_map == "None") return res;
+
+		Grid2D<cTile>* grid = this->mGrids2D[this->current_map];
+		float x_slice = (float)this->width / (float)grid->getColumns();
+		float y_slice = (float)this->height / (float)grid->getRows();
+
+		gx = mpx / (int)x_slice;
+		gy = mpy / (int)y_slice;
+
+		res[0] = gx;
+		res[1] = gy;
+		return res;
+	}
+
+	Entity* e;
 
 	void drawGrid(std::string name) {
 
@@ -223,6 +281,12 @@ private:
 					SDL_SetRenderDrawColor(renderer, colors[0], colors[1], colors[2], colors[3]);
 					SDL_FRect rect = { x * rect_size_width, y * rect_size_height, rect_size_width, rect_size_height };
 					SDL_RenderFillRectF(this->renderer, &rect);
+
+					if (this->selected != nullptr && this->selected == grid->get(x, y)) {
+						SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+						SDL_RenderDrawRectF(renderer, &rect);
+					}
+
 					delete[] colors;
 				}
 			}
@@ -231,6 +295,7 @@ private:
 			std::cerr << name << " is not stored in the Engine!" << std::endl;
 		}
 	}
+
 };
 
 
