@@ -11,6 +11,7 @@
 #include "Entity.h"
 #include "globals.h"
 #include "SDL2_gfxPrimitives.h"
+#include "SDL2_framerate.h"
 
 template<class cTile>
 class Grid2DEngine {
@@ -27,6 +28,9 @@ public:
 		current_map = "None";
 
 		this->e = new Entity();
+
+		SDL_initFramerate(&this->sFPSManager);
+		SDL_setFramerate(&this->sFPSManager, this->max_fps);
 	}
 	~Grid2DEngine() {
 		this->mGrids2D.clear();
@@ -79,48 +83,15 @@ public:
 			return;
 		}
 
-		Uint32 now = SDL_GetTicks();
-		this->fElapsedTime = (now - this->fLastTime) / 1000.0f;
+		this->fElapsedTime = SDL_framerateDelay(&this->sFPSManager) / 1000.0f;
+
+		SDL_SetWindowTitle(this->window, (this->current_map + ". " + std::to_string(SDL_getFramerate(&this->sFPSManager)) + "fps, fElapedTime=" + std::to_string(this->fElapsedTime)).c_str());
 
 		this->handleEvents();
 
-		if (ENGINE_LIMIT_FPS) {
-			if (next_game_step <= now) {
+		this->update();
 
-				int computer_is_too_slow_limit = 10; // max number of advances per render, adjust this according to your minimum playable fps
-
-				// Loop until all steps are executed or computer_is_too_slow_limit is reached
-				while ((next_game_step <= now) && (computer_is_too_slow_limit--)) {
-					this->update();
-					next_game_step += time_step_ms; // count 1 game tick done
-				}
-
-				this->render();
-			}
-			else {
-				// we're too fast, wait a bit.
-				if (next_game_step - now > 10) {
-					SDL_Delay(next_game_step - now);
-				}
-			}
-		}
-		else {
-			this->update();
-
-			this->render();
-		}
-
-		frametime_tracker.push_back(SDL_GetTicks() - now);
-		if (frametime_tracker.size() > 60) frametime_tracker.pop_front();
-		if (!this->frametime_tracker.empty()) {
-			float _avg = (float)std::accumulate(frametime_tracker.begin(), frametime_tracker.end(), 0.0) / (float)frametime_tracker.size();
-			float _fps = 1000.0f / _avg;
-			int _ifps = (int)(_fps);
-			SDL_SetWindowTitle(this->window, (this->current_map + ". " + std::to_string(_ifps) + "fps, fElapedTime=" + std::to_string(this->fElapsedTime)).c_str());
-		}
-
-		this->fLastTime = now;
-
+		this->render();
 	}
 
 	void handleEvents() {
@@ -181,8 +152,6 @@ public:
 		}
 	}
 	void update() {
-	
-
 
 	}
 	void render() {
@@ -221,10 +190,8 @@ public:
 	}
 
 private:
-	Uint32 max_fps = 30;
-	Uint32 time_step_ms = 1000 / max_fps;
-	Uint32 next_game_step = SDL_GetTicks(); // initial value
-	std::list<Uint32> frametime_tracker = std::list<Uint32>();
+	int max_fps = 60;
+	FPSmanager sFPSManager;
 
 	Uint32 fLastTime = 0;
 	float fElapsedTime = 0.0f;
